@@ -1,95 +1,89 @@
-`include "register.v"
+// Liv Kelley, Jamie O'Brien, Sabrina Pereira
+// Sequential Multiplier Control Logic
 
-// Define instructions - based on controlLogic.t.v from lab 3
+// Define opcodes/functs
+`define LW      6'h23
+`define SW      6'h2b
+`define J       6'h2
+`define JR      6'h08
+`define JAL     6'h3
+`define BEQ     6'h4
+`define BNE     6'h5
+`define XORI    6'he
+`define ADDI    6'h8
+`define Rtype   6'h0
+`define ADD     6'h20
+`define SUB     6'h22
+`define SLT     6'h2a
 
-`define LW
-`define SW
-`define J
-`define JR
-`define JAL
-`define BEQ
-`define BNE
-`define XORI
-`define ADDI
-`define ADD
-`define SUB
-`define SLT
 
-// Define states (Based on FSM diagram/slides)
-
-`define IF
-`define ID
-`define EX
-`define WB
-`define MEM
-`define WB
-
-// FSM module
-
-module fsm
+/*
+Control Logic
+*/
+module controlLogic
 (
-
-output reg[11:0] newState,
-//input reg[11:0] instruct,  // ADD, SUB, SLT, XORI, ADDI,
-input reg[0] cycle          // JR, JAL, J, BNE, BEQ, LW, SW
-  );
-
-always @ posedge begin
-
-reg[2:0] math
-reg[1:0] math_imm
-reg[0] jumpreg
-reg[1:0] jump
-reg[1:0] branch
-reg[1:0] store
-
-math <= [instruct[0], instruct[1], instruct[2]] // ADD, SUB, SLT
-math_imm <= [instruct[3], instruct[4]]           // XORI, ADDI
-jumpreg <= [instruct[5]]                         // JR
-jump <= [instruct[6], instruct[7]]               // JAL, J
-branch <= [instruct[8], instruct[9]]             // BNE, BEQ
-store <= [instruct[10], instruct[11]]            // LW, SW
+output reg[1:0]    RegDst,
+output reg         RegWr,
+output reg         ALUSrc,
+output reg[2:0]    ALUcntrl,
+output reg         MemWr,
+output reg[1:0]    MemToReg,
+output reg         jump,
+output reg         bne,
+output reg         beq,
+input  [5:0]       funct,
+input  [5:0]       opcode,
+input              clk
+);
 
 
-// IF = 1, ID = 2, EX = 3, MEM = 4, WB = 5
 
-this_cycle = IF;
+// This isn't totally finished. The states need to be set to something and there needs to be a way to return values. 
+// We also have to relate it back to the control signals. 
+
+always @* begin
+
+if (opcode == `Rtype) begin
+    case (funct)
+    `ADD:    begin   IF; ID; EX; WB; end
+    `SUB:    begin   IF; ID; EX; WB; end
+    `SLT:    begin   IF; ID; EX; WB; end
+    `JR:     begin   IF; ID; end 
+    endcase
+  end else begin
+end else begin
+    case (opcode)
+    `LW:     begin   IF; ID; MEM; EX; WB; end 
+    `SW:     begin   IF; ID; MEM; EX; WB; end 
+    `J:      begin   IF; ID; end 
+    `JAL:    begin   IF; ID; WB; end 
+    `BEQ:    begin   IF; ID; EX; end
+    `BNE:    begin   IF; ID; EX; end
+    `XORI:   begin   IF; ID; EX; WB; end 
+    `ADDI:   begin   IF; ID; EX; WB; end 
+    endcase
+  end
 
 
-if (cycle == 1)
-    begin
-     math <= [ID, ID, ID]
-     math_imm <= [ID, ID]
-     jumpreg <= [ID]
-     jump <= [ID, ID]
-     branch <= [ID, ID]
-     store <= [ID, ID] // have to figure out how to do this
-    end                                            // requires putting values from another register into this one
 
-else if (cycle == 2)
-    begin
-    math <= [EX, EX, EX]
-    math_imm <= [EX, EX]
-    jumpreg <= [IF]
-    jump <= [IF, WB]
-    branch <= [EX, EX]
-    store <= [EX, EX]
-    end
-
-else if (cycle == 3)
-    math <= [WB, WB, WB]
-    math_imm <= [WB, WB]
-    branch <= [IF, IF]
-    store <= [WB, MEM]
-    end
-
-else if (cycle == 4)
-    store <= [IF, IF]
-endcase
-
-case (5)
-    math <= [IF, IF, IF]
-    math_imm <= [IF, IF]
-    jump <= [IF, IF]
-    store <= [IF, IF]
-endcase
+  if (opcode == `Rtype) begin
+    case (funct)
+    `ADD:    begin   RegDst=2'b0; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; end
+    `SUB:    begin   RegDst=2'b0; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; end
+    `SLT:    begin   RegDst=2'b0; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'd3; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; end
+    `JR:     begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b1; end
+    endcase
+  end else begin
+    case (opcode)
+    `LW:     begin   RegDst=2'd2; RegWr=1'b1; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd1; bne=1'b0; beq=1'b0; jump=1'b0; end
+    `SW:     begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b1; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; end
+    `J:      begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b1; end
+    `JAL:    begin   RegDst=2'b1; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd2; bne=1'b0; beq=1'b0; jump=1'b1; end
+    `BEQ:    begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b1; jump=1'b0; end
+    `BNE:    begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b1; beq=1'b0; jump=1'b0; end
+    `XORI:   begin   RegDst=2'd2; RegWr=1'b1; ALUSrc=1'b1; ALUcntrl=3'd2; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; end
+    `ADDI:   begin   RegDst=2'd2; RegWr=1'b1; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; end
+    endcase
+  end
+end
+endmodule

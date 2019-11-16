@@ -9,6 +9,7 @@
      2^32 bytes), so the upper 18 bits of the addresses must be zero
 ----------------------------------------------------------------------------*/
 
+
 module memory
 (
     // Read port for instructions
