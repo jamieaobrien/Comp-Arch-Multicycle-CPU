@@ -83,7 +83,7 @@ register registerRs(.d(R_rs), .q(R_rs_Stored), .wrenable(*****), .clk(clk));
 
 register registerRt(.d(R_rt), .q(R_rt_Stored), .wrenable(*****), .clk(clk));
 
-PCaddrGen PCaddrGen(.PC4(PC4),.branchAddress(branchAddress),.jumpAddress(jumpAddress),.address(address),.immediate(immediate),.opcode(opcode),.R_rs(R_rs),.PC(currentPC),.clk(clk));
+PCaddrGen PCaddrGen(.PC4(PC4),.branchAddress(branchAddress),.jumpAddress(jumpAddress),.address(address),.immediate(immediate),.opcode(opcode),.R_rs(R_rs_Stored),.PC(currentPC),.clk(clk));
 
 // Mux to choose between immediate and register data operands for ALU
 mux2to1 #(32) addendMUX (.out(addend), .address(ALUsource),.input0(R_rt_Stored), .input1({16'b0, immediate}));
