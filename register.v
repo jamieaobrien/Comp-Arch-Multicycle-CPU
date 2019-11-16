@@ -10,7 +10,7 @@ sum. The width parameter can be changed when instantiating the module to change
 the size of the data being stored.
 -----------------------------------------------------------------------------*/
 module register
-#(parameter width = 4)
+#(parameter width = 32)
 (
 output reg[width-1:0] q, // 4 bit output
 input[width-1:0]      d, // 4 bit input
