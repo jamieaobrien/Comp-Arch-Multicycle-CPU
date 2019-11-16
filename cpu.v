@@ -31,13 +31,15 @@ wire  [31:0]  currentPC;
 
 // Wire for instruction memory output
 wire  [31:0]  instruction;
+wire  [31:0]  instructionStored;
+
 
 // Wires for decoder output
 wire  [4:0]  rs, rt, rd;
 wire  [15:0] immediate;
-wire  [25:0]  address;
+wire  [25:0] address;
 wire  [5:0]  opcode;
-wire  [5:0] funct;
+wire  [5:0]  funct;
 
 // Wires for control logic signals
 wire  [2:0]  ALUcontrol;
@@ -48,6 +50,7 @@ wire  jump, bne, beq; // Flags for choosing new NewPC
 
 // Wires for regfile outputs
 wire  [31:0]  R_rt, R_rs;
+wire  [31:0]  R_rs_Stored, R_rt_Stored;
 
 // Wires for intermediary calculations/inputs
 wire  [31:0] addend, res, memData;
@@ -62,23 +65,31 @@ wire  [31:0] PC4, branchAddress, jumpAddress;
 // Instantiate modules
 //------------------------------------------------------------------------------
 
+// Do we need to have an alu output register? ******
+
 PCchoose PCchoose(.clk(clk),.PC4(PC4),.bne(bne),.beq(beq),.branchAddr(branchAddress),.jumpAddr(jumpAddress),.zero(zero),.jump(jump),.reset(reset),.PC(currentPC));
+
 memory memory(.PC(currentPC),.instruction(instruction),.data_out(memData),.data_in(R_rt),.data_addr(res),.clk(!clk),.wr_en(MemWr));
 
-decoder decoder(.rs(rs),.rt(rt),.rd(rd),.immediate(immediate),.address(address),.opcode(opcode),.funct(funct),.instruction(instruction));
+register registerInstruction(.d(instruction), .q(instructionStored), .wrenable(*****), .clk(clk));
+
+decoder decoder(.rs(rs),.rt(rt),.rd(rd),.immediate(immediate),.address(address),.opcode(opcode),.funct(funct),.instruction(instructionStored));
 
 controlLogic controlLogic(.RegDst(RegDst),.RegWr(RegWr),.ALUSrc(ALUsource),.ALUcntrl(ALUcontrol),.MemWr(MemWr),.MemToReg(MemToReg),.jump(jump),.bne(bne),.beq(beq),.funct(funct),.opcode(opcode),.clk(clk));
 
 regfile regfile(.ReadData1(R_rs),.ReadData2(R_rt),.WriteData(WriteData),.ReadRegister1(rs),.ReadRegister2(rt),.WriteRegister(WriteRegister),.RegWrite(RegWr),.Clk(!clk));
 
+register registerRs(.d(R_rs), .q(R_rs_Stored), .wrenable(*****), .clk(clk));
+
+register registerRt(.d(R_rt), .q(R_rt_Stored), .wrenable(*****), .clk(clk));
+
 PCaddrGen PCaddrGen(.PC4(PC4),.branchAddress(branchAddress),.jumpAddress(jumpAddress),.address(address),.immediate(immediate),.opcode(opcode),.R_rs(R_rs),.PC(currentPC),.clk(clk));
 
-
 // Mux to choose between immediate and register data operands for ALU
-mux2to1 #(32) addendMUX (.out(addend), .address(ALUsource),.input0(R_rt), .input1({16'b0, immediate}));
+mux2to1 #(32) addendMUX (.out(addend), .address(ALUsource),.input0(R_rt_Stored), .input1({16'b0, immediate}));
 
 // Setting up ALU
-ALU alu(.result(res),.carryout(carryout),.zero(zero),.overflow(overflow),.operandA(R_rs),.operandB(addend),.command(ALUcontrol));
+ALU alu(.result(res),.carryout(carryout),.zero(zero),.overflow(overflow),.operandA(R_rs_Stored),.operandB(addend),.command(ALUcontrol));
 
 // Behavioral Mux to choose which register to write to
 always @* begin
