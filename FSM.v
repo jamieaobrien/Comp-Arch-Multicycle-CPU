@@ -70,8 +70,8 @@ always @(posedge clk) begin
   case (state)
     `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; end
     `ID: begin
-      R_rsReg = 1'b0;
-      R_rtReg = 1'b0;
+      //R_rsReg = 1'b0;
+      //R_rtReg = 1'b0;
       //always @* begin
         addrGen = 1'b1;
         instrReg = 1'b0;

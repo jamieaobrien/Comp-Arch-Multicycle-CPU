@@ -47,7 +47,7 @@ $display("Logic Test");
 $display("opcode funct  |  RegDst  RegWr  ALUSrc  ALUcntrl   MemWr MemToReg Jump BNE BEQ wb mem addrGen instrReg nextState");
 clk=0; opcode=6'b0; funct=`SLT; #5 clk=1; #5 clk=0; #5 clk=1; #10000
 $display(" %h      %h   |    %b      %b      %b       %b        %b      %b      %b   %b   %b   %b  %b     %b       %b        %b",
-opcode,funct,RegDst,RegWr,ALUSrc,ALUcntrl,MemWr,MemToReg,jump,bne,beq,wb,mem,addrGen,instrReg,nextState,R_rsReg,R_rtReg);
+opcode,funct,RegDst,RegWr,ALUSrc,ALUcntrl,MemWr,MemToReg,jump,bne,beq,wb,mem,addrGen,instrReg,nextState);
 clk=0; #5 clk=1; #5 clk=0; #5 clk=1; #5 clk=0; #5 clk=1; #5 clk=0; opcode=6'b0; funct=`ADD; #5 clk=1; #10000
 $display(" %h      %h   |    %b      %b      %b       %b        %b      %b      %b   %b   %b   %b  %b     %b       %b        %b",
 opcode,funct,RegDst,RegWr,ALUSrc,ALUcntrl,MemWr,MemToReg,jump,bne,beq,wb,mem,addrGen,instrReg,nextState);
