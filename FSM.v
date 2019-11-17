@@ -1,5 +1,7 @@
+// Liv Kelley, Jamie O'Brien, Sabrina Pereira
+// Multicycle CPU FSM
 
-
+// Define CPU operation opcodes and functs
 `define LW      6'h23
 `define SW      6'h2b
 `define J       6'h2
@@ -15,15 +17,29 @@
 `define SLT     6'h2a
 
 
+// Define FSM states
+`define IF   3'd0   // Instruction fetch
+`define ID   3'd1   // Instruction decode
+`define EX   3'd2   // Execute
+`define MEM  3'd3   // Memory
+`define WB   3'd4   // Write back
 
-`define IF   3'd0
-`define ID   3'd1
-`define EX   3'd2
-`define MEM  3'd3
-`define WB   3'd4
-
-
-
+/*-----------------------------------------------------------------------------
+FSM module
+This module moves the CPU through the appropriate states depending on the current
+operation. It starts in Instruction Fetch. For every operation, the FSM is in IF
+for once cycle and always goes to Instruction Decode next. In ID, the control
+signals for the current operation are set. The FSM then goes to either Execute,
+Memory, Write Back, or Instruction Fetch depending on what is required for the
+current operation.
+In EX, the write back and memory flags, wb and mem, are checked to determine
+the next state of the current operation. If the operation requires WB or MEM, wb
+or mem will be 1, respectively. The MEM state checks the wb flag again and then
+switches states to either WB or IF. The WB state goes back to IF. There are four
+addition control signals. addrGen is only high in ID. instrReg is only high in
+IF. It is the write enable for the instruction register. The write enables for
+the R_rs and R_rt registers, R_rsReg and R_rtReg, are only high in EX.
+------------------------------------------------------------------------------*/
 module FSM (
   output reg[1:0]    RegDst,
   output reg         RegWr,
@@ -52,7 +68,7 @@ initial nextState = `IF;
 always @(posedge clk) begin
   state = nextState;
   case (state)
-    `IF: begin addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; end
+    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; end
     `ID: begin
       R_rsReg = 1'b0;
       R_rtReg = 1'b0;
@@ -91,7 +107,7 @@ always @(posedge clk) begin
       endcase
       case (mem)
         0: begin  nextState=nextState;  end
-        1: begin  nextState=`MEM;        end
+        1: begin  nextState=`MEM;       end
       endcase
     end
     `MEM: begin
