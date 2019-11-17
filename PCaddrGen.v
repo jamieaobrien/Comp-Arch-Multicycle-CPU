@@ -31,8 +31,8 @@ input              clk
 reg [13:0] extend;
 
 always @* begin
-  if (addrGen == 1)               // This if statement allows the control signal to
-                                  // initialize the address generator. 
+  if (addrGen == 1)  begin        // This if statement allows the control signal to
+                                  // initialize the address generator.
   extend[13:0] = immediate[15];
   PC4 = PC + 32'd4;
   branchAddress = {extend,immediate,2'b0}+PC4;

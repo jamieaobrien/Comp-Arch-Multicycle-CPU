@@ -50,11 +50,11 @@ module FSM (
   output reg         jump,
   output reg         bne,
   output reg         beq,
-  output reg         wb,
-  output reg         mem,
+  //output reg         wb,
+  //output reg         mem,
   output reg         addrGen,
   output reg         instrReg,
-  output reg[2:0]    nextState,
+  //output reg[2:0]    nextState,
   output reg         R_rsReg,
   output reg         R_rtReg,
   input  [5:0]       funct,
@@ -62,7 +62,9 @@ module FSM (
   input              clk
   );
 reg[2:0]  state;
-//reg[2:0]  nextState;
+reg[2:0]  nextState;
+reg       wb;
+reg       mem;
 initial nextState = `IF;
 
 always @(posedge clk) begin
