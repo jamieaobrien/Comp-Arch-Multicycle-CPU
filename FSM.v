@@ -41,7 +41,7 @@ IF. It is the write enable for the instruction register. The write enables for
 the R_rs and R_rt registers, R_rsReg and R_rtReg, are only high in EX.
 ------------------------------------------------------------------------------*/
 module FSM (
-  output[2:0]        state,
+
   output reg[1:0]    RegDst,
   output reg         RegWr,
   output reg         ALUSrc,
@@ -63,7 +63,7 @@ module FSM (
   input  [5:0]       opcode,
   input              clk
   );
-//reg[2:0]  state;
+reg[2:0]  state;
 reg[2:0]  nextState;
 reg       wb;
 reg       mem;
