@@ -72,7 +72,7 @@ PCchoose PCchoose(.clk(clk),.PC4(PC4),.bne(bne),.beq(beq),.branchAddr(branchAddr
 
 memory memory(.PC(currentPC),.instruction(instruction),.data_out(memData),.data_in(R_rt),.data_addr(res),.clk(!clk),.wr_en(MemWr));
 
-register registerInstruction(.d(instruction), .q(instructionStored), .wrenable(instrReg), .clk(clk));
+register registerInstruction(.d(instruction), .q(instructionStored), .wrenable(instrReg), .clk(!clk));
 
 decoder decoder(.rs(rs),.rt(rt),.rd(rd),.immediate(immediate),.address(address),.opcode(opcode),.funct(funct),.instruction(instructionStored));
 
@@ -82,9 +82,9 @@ FSM FSM(.RegDst(RegDst),.RegWr(RegWr),.ALUSrc(ALUsource),.ALUcntrl(ALUcontrol),.
 
 regfile regfile(.ReadData1(R_rs),.ReadData2(R_rt),.WriteData(WriteData),.ReadRegister1(rs),.ReadRegister2(rt),.WriteRegister(WriteRegister),.RegWrite(RegWr),.Clk(!clk));
 
-register registerRs(.d(R_rs), .q(R_rs_Stored), .wrenable(R_rsReg), .clk(clk));
+register registerRs(.d(R_rs), .q(R_rs_Stored), .wrenable(R_rsReg), .clk(!clk));
 
-register registerRt(.d(R_rt), .q(R_rt_Stored), .wrenable(R_rtReg), .clk(clk));
+register registerRt(.d(R_rt), .q(R_rt_Stored), .wrenable(R_rtReg), .clk(!clk));
 
 PCaddrGen PCaddrGen(.PC4(PC4),.branchAddress(branchAddress),.jumpAddress(jumpAddress),.addrGen(addrGen),.address(address),.immediate(immediate),.opcode(opcode),.R_rs(R_rs_Stored),.PC(currentPC),.clk(clk));
 
