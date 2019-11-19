@@ -31,9 +31,7 @@ wire  [31:0]  PC;
 wire  [31:0]  PCStored;
 
 // Wire for instruction memory output
-// wire  [31:0]  instruction;
-wire  [31:0]  instructionStored;
-
+wire  [31:0]  instruction;
 
 // Wires for decoder output
 wire  [4:0]  rs, rt, rd;
@@ -48,7 +46,7 @@ wire  ALUsource;
 wire  [1:0]  MemToReg, RegDst; // Not fully sure what size these need to be?
 wire  MemWr, RegWr; // Write enables
 wire  jump, bne, beq; // Flags for choosing new NewPC
-wire  instrReg, R_rsReg, R_rtReg, PCReg; // Enables for registers that hold in-between state values
+wire  PCReg, R_rsReg, R_rtReg; // Enables for registers that hold in-between state values
 wire  addrGen;
 // Wires for regfile outputs
 wire  [31:0]  R_rt, R_rs;
@@ -67,26 +65,22 @@ wire  [31:0] PC4, branchAddress, jumpAddress;
 // Instantiate modules
 //------------------------------------------------------------------------------
 
-// Do we need to have an alu output register? ******
-
+// Choose what the new PC value should be and store it for duration of operation
 PCchoose PCchoose(.clk(clk),.PC4(PC4),.bne(bne),.beq(beq),.branchAddr(branchAddress),.jumpAddr(jumpAddress),.zero(zero),.jump(jump),.reset(reset),.PC(PC));
+register registerPC(.d(PC), .q(PCStored), .wrenable(PCReg), .clk(!clk));
 
-register registerPC(.d(PC), .q(PCStored), .wrenable(instrReg), .clk(!clk));
+memory memory(.PC(PCStored),.instruction(instruction),.data_out(memData),.data_in(R_rt),.data_addr(res),.clk(!clk),.wr_en(MemWr));
 
-memory memory(.PC(PCStored),.instruction(instructionStored),.data_out(memData),.data_in(R_rt),.data_addr(res),.clk(!clk),.wr_en(MemWr));
-
-// register registerInstruction(.d(instruction), .q(instructionStored), .wrenable(instrReg), .clk(!clk));
-
-decoder decoder(.rs(rs),.rt(rt),.rd(rd),.immediate(immediate),.address(address),.opcode(opcode),.funct(funct),.instruction(instructionStored));
+decoder decoder(.rs(rs),.rt(rt),.rd(rd),.immediate(immediate),.address(address),.opcode(opcode),.funct(funct),.instruction(instruction));
 
 FSM FSM(.RegDst(RegDst),.RegWr(RegWr),.ALUSrc(ALUsource),.ALUcntrl(ALUcontrol),.MemWr(MemWr),
                  .MemToReg(MemToReg),.jump(jump),.bne(bne),.beq(beq),.addrGen(addrGen),
-                 .instrReg(instrReg),.R_rsReg(R_rsReg),.R_rtReg(R_rtReg),.PCReg(PCReg),.funct(funct),.opcode(opcode),.clk(clk));
+                 .PCReg(PCReg),.R_rsReg(R_rsReg),.R_rtReg(R_rtReg),.funct(funct),.opcode(opcode),.clk(clk));
 
 regfile regfile(.ReadData1(R_rs),.ReadData2(R_rt),.WriteData(WriteData),.ReadRegister1(rs),.ReadRegister2(rt),.WriteRegister(WriteRegister),.RegWrite(RegWr),.Clk(!clk));
 
+// Store output values from registers
 register registerRs(.d(R_rs), .q(R_rs_Stored), .wrenable(R_rsReg), .clk(!clk));
-
 register registerRt(.d(R_rt), .q(R_rt_Stored), .wrenable(R_rtReg), .clk(!clk));
 
 PCaddrGen PCaddrGen(.PC4(PC4),.branchAddress(branchAddress),.jumpAddress(jumpAddress),.addrGen(addrGen),.address(address),.immediate(immediate),.opcode(opcode),.R_rs(R_rs_Stored),.PC(PCStored),.clk(clk));
