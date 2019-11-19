@@ -72,7 +72,6 @@ always @(posedge clk) begin
     `ID: begin
       R_rsReg = 1'b1;
       R_rtReg = 1'b1;
-      //always @* begin
         addrGen = 1'b1;
         PCReg = 1'b0;
         if (opcode == `Rtype) begin
@@ -94,8 +93,6 @@ always @(posedge clk) begin
             `ADDI:   begin   RegDst=2'd2; ALUSrc=1'b1; ALUcntrl=3'd0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
             endcase
           end
-      //  end
-
     end
     `EX: begin
       R_rsReg = 1'b0;
