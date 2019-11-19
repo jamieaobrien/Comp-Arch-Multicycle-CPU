@@ -72,7 +72,7 @@ initial nextState = `IF;
 always @(posedge clk) begin
   state = nextState;
   case (state)
-    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; PCReg=1'b1; MemWr=1'b1; end
+    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; PCReg=1'b1; MemWr=1'b0; end
     `ID: begin
       R_rsReg = 1'b1;
       R_rtReg = 1'b1;
@@ -127,7 +127,7 @@ always @(posedge clk) begin
         1: begin  nextState=`WB;  end
       endcase
     end
-    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1; PCReg = 1'b1; MemWr=1'b1;  end
+    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1; PCReg = 1'b1; MemWr=1'b0;  end
   endcase
 end
 endmodule
