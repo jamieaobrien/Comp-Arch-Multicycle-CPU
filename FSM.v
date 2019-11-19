@@ -117,7 +117,10 @@ always @(posedge clk) begin
       endcase
     end
     `MEM: begin
-      MemWr=1'b1;
+      case (opcode)
+        `LW: begin  MemWr=1'b0;  end
+        `SW: begin  MemWr=1'b1;  end
+      endcase
       PCReg = 1'b1;
       R_rsReg = 1'b0;
       R_rtReg = 1'b0;
