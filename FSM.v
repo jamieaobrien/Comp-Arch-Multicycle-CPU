@@ -70,7 +70,7 @@ initial nextState = `IF;
 always @(posedge clk) begin
   state = nextState;
   case (state)
-    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; end
+    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; end
     `ID: begin
       //R_rsReg = 1'b0;
       //R_rtReg = 1'b0;
@@ -79,21 +79,21 @@ always @(posedge clk) begin
         instrReg = 1'b0;
         if (opcode == `Rtype) begin
             case (funct)
-            `ADD:    begin   RegDst=2'b0; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
-            `SUB:    begin   RegDst=2'b0; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
-            `SLT:    begin   RegDst=2'b0; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'd3; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
-            `JR:     begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b1; wb=1'b0; mem=1'b0; nextState=`IF;  end
+            `ADD:    begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
+            `SUB:    begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
+            `SLT:    begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'd3; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
+            `JR:     begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b1; wb=1'b0; mem=1'b0; nextState=`IF;  end
             endcase
           end else begin
             case (opcode)
-            `LW:     begin   RegDst=2'd2; RegWr=1'b1; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd1; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b1; nextState=`EX;  end
-            `SW:     begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b1; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b0; mem=1'b1; nextState=`EX;  end
-            `J:      begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b1; wb=1'b1; mem=1'b0; nextState=`IF;  end
-            `JAL:    begin   RegDst=2'b1; RegWr=1'b1; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd2; bne=1'b0; beq=1'b0; jump=1'b1; wb=1'b1; mem=1'b0; nextState=`WB;  end
-            `BEQ:    begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b1; jump=1'b0; wb=1'b0; mem=1'b0; nextState=`EX;  end
-            `BNE:    begin   RegDst=2'b0; RegWr=1'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b1; beq=1'b0; jump=1'b0; wb=1'b0; mem=1'b0; nextState=`EX;  end
-            `XORI:   begin   RegDst=2'd2; RegWr=1'b1; ALUSrc=1'b1; ALUcntrl=3'd2; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
-            `ADDI:   begin   RegDst=2'd2; RegWr=1'b1; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
+            `LW:     begin   RegDst=2'd2; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd1; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b1; nextState=`EX;  end
+            `SW:     begin   RegDst=2'b0; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b1; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b0; mem=1'b1; nextState=`EX;  end
+            `J:      begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b1; wb=1'b0; mem=1'b0; nextState=`IF;  end
+            `JAL:    begin   RegDst=2'b1; ALUSrc=1'b0; ALUcntrl=3'b0; MemWr=1'b0; MemToReg=2'd2; bne=1'b0; beq=1'b0; jump=1'b1; wb=1'b1; mem=1'b0; nextState=`WB;  end
+            `BEQ:    begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b1; jump=1'b0; wb=1'b0; mem=1'b0; nextState=`EX;  end
+            `BNE:    begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'd1; MemWr=1'b0; MemToReg=2'd0; bne=1'b1; beq=1'b0; jump=1'b0; wb=1'b0; mem=1'b0; nextState=`EX;  end
+            `XORI:   begin   RegDst=2'd2; ALUSrc=1'b1; ALUcntrl=3'd2; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
+            `ADDI:   begin   RegDst=2'd2; ALUSrc=1'b1; ALUcntrl=3'd0; MemWr=1'b0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
             endcase
           end
       //  end
@@ -121,7 +121,7 @@ always @(posedge clk) begin
         1: begin  nextState=`WB;  end
       endcase
     end
-    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0;  end
+    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1;  end
   endcase
 end
 endmodule
