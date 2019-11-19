@@ -1,7 +1,9 @@
 Starting report
 =======
-# CompArch Lab3: Single Cycle CPU
+# CompArch Lab4:  Multicycle CPU
 ### Sabrina, Liv, and Jamie
+
+![](./images/Multicycle_Final_Diagram.png)
 
 ## Processor Architecture
 
@@ -31,5 +33,5 @@ The FSM shown above has five states: Instruction Fetch (IF), Instruction Decode 
 ![](./images/branch.png)
 
 ## Performance and Design Analysis
-   
+In our multi-cycle CPU, the operations take different numbers of cycles. `JR` and `J` each take two cycles. `JAL`, `BNE`, and `BEQ` each take three cycles. `ADD`, `SUB`, `SLT`, `SW`, `XORI`, and `ADDI` each take four cycles. `LW` takes 5 cycles.
 
