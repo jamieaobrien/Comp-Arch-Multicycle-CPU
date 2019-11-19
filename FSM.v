@@ -36,8 +36,8 @@ In EX, the write back and memory flags, wb and mem, are checked to determine
 the next state of the current operation. If the operation requires WB or MEM, wb
 or mem will be 1, respectively. The MEM state checks the wb flag again and then
 switches states to either WB or IF. The WB state goes back to IF. There are four
-addition control signals. addrGen is only high in ID. instrReg is only high in
-IF. It is the write enable for the instruction register. The write enables for
+addition control signals. addrGen is only high in ID. PCReg is only high in
+IF. It is the write enable for the PC register. The write enables for
 the R_rs and R_rt registers, R_rsReg and R_rtReg, are only high in EX.
 ------------------------------------------------------------------------------*/
 module FSM (
@@ -51,14 +51,10 @@ module FSM (
   output reg         jump,
   output reg         bne,
   output reg         beq,
-  //output reg         wb,
-  //output reg         mem,
   output reg         addrGen,
-  output reg         instrReg,
-  //output reg[2:0]    nextState,
+  output reg         PCReg,
   output reg         R_rsReg,
   output reg         R_rtReg,
-  output reg         PCReg,
   input  [5:0]       funct,
   input  [5:0]       opcode,
   input              clk
@@ -72,14 +68,13 @@ initial nextState = `IF;
 always @(posedge clk) begin
   state = nextState;
   case (state)
-    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; PCReg=1'b1; MemWr=1'b0; end
+    `IF: begin  addrGen = 1'b0; nextState <= `ID; PCReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; MemWr=1'b0; end
     `ID: begin
       R_rsReg = 1'b1;
       R_rtReg = 1'b1;
       //always @* begin
-        PCReg=1'b0;
         addrGen = 1'b1;
-        instrReg = 1'b0;
+        PCReg = 1'b0;
         if (opcode == `Rtype) begin
             case (funct)
             `ADD:    begin   RegDst=2'b0; ALUSrc=1'b0; ALUcntrl=3'd0; MemToReg=2'd0; bne=1'b0; beq=1'b0; jump=1'b0; wb=1'b1; mem=1'b0; nextState=`EX;  end
@@ -103,7 +98,6 @@ always @(posedge clk) begin
 
     end
     `EX: begin
-      PCReg = 1'b1;
       R_rsReg = 1'b0;
       R_rtReg = 1'b0;
       addrGen = 1'b0;
@@ -120,8 +114,7 @@ always @(posedge clk) begin
       case (opcode)
         `LW: begin  MemWr=1'b0;  end
         `SW: begin  MemWr=1'b1;  end
-      endcase
-      PCReg = 1'b1;
+      endcas
       R_rsReg = 1'b0;
       R_rtReg = 1'b0;
       addrGen = 1'b0;
@@ -130,7 +123,7 @@ always @(posedge clk) begin
         1: begin  nextState=`WB;  end
       endcase
     end
-    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1; PCReg = 1'b1; MemWr=1'b0;  end
+    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1; MemWr=1'b0;  end
   endcase
 end
 endmodule
