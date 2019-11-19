@@ -74,8 +74,8 @@ always @(posedge clk) begin
   case (state)
     `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; PCReg=1'b1; end
     `ID: begin
-      //R_rsReg = 1'b0;
-      //R_rtReg = 1'b0;
+      R_rsReg = 1'b1;
+      R_rtReg = 1'b1;
       //always @* begin
         PCReg=1'b0;
         addrGen = 1'b1;
@@ -104,8 +104,8 @@ always @(posedge clk) begin
     end
     `EX: begin
       PCReg = 1'b1;
-      R_rsReg = 1'b1;
-      R_rtReg = 1'b1;
+      R_rsReg = 1'b0;
+      R_rtReg = 1'b0;
       addrGen = 1'b0;
       case (wb)
         0: begin  nextState=`IF;  end
