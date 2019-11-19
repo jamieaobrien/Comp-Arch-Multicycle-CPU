@@ -19,7 +19,7 @@ module cpu_test ();
     initial begin
 
       // $readmemh("spin.dat", cpu.memory.mem,0);
-      $readmemh("asmtest/test2.text", cpu.memory.mem,0);
+      $readmemh("asmtest/test8.text", cpu.memory.mem,0);
 
 
     	// Dump waveforms to file
