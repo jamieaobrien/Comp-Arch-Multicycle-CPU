@@ -1,7 +1,9 @@
 Starting report
 =======
-# CompArch Lab3: Single Cycle CPU
+# CompArch Lab4:  Multicycle CPU
 ### Sabrina, Liv, and Jamie
+
+![](./images/Multicycle_Final_Diagram.png)
 
 ## Processor Architecture
 
