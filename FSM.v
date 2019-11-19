@@ -58,6 +58,7 @@ module FSM (
   //output reg[2:0]    nextState,
   output reg         R_rsReg,
   output reg         R_rtReg,
+  output reg         PCReg,
   input  [5:0]       funct,
   input  [5:0]       opcode,
   input              clk
