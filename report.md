@@ -1,5 +1,3 @@
-occurredoccurredStarting report
-=======
 # CompArch Lab4:  Multicycle CPU
 ### Sabrina, Liv, and Jamie
 
@@ -13,7 +11,7 @@ As with last time, the program counter generator will take in the address for br
 
 The instruction memory outputs instructions, for which the PC value is the address. This instruction can then be passed into the decoder, which will break it up into the possible values for `Rs`, `Rt`, `Rd`, `Imm16`, `address`, `opcode`, and `func`. Some of these outputs are wired into the PC address generator so that the address generator can produce the new possible PC addresses, `PC4`, `jumpAddr`, and `branchAddr`. When the address generator is enabled by control signals produced by the FSM, these outputs can be passed back into the PCchoose module. The decoded operands (`Rs`, `Rt`, `Rd`, and `Imm16`) can then be passed into the calculation circuit.
 
-The calculation circuit consists of various subcomponents whose function will depend on the operation to be performed. It includes a regfile, which is split into two parts on the diagram above. When Rs and Rt are passed into the regfile, the outputs are stored into registers (which are enabled by FSM control signals). The R[rs] signal is passed into the ALU. The (Imm16) or R[Rt] can also be passed into the ALU. The ALU can then perform a calculation according to the instruction given. The output can then be stored in a memory file when necessary, and written back to the register file as dictated by the FSM control signals. 
+The calculation circuit consists of various subcomponents whose function will depend on the operation to be performed. It includes a regfile, which is split into two parts on the diagram above. When Rs and Rt are passed into the regfile, the outputs are stored into registers (which are enabled by FSM control signals). The R[rs] signal is passed into the ALU. The (Imm16) or R[Rt] can also be passed into the ALU. The ALU can then perform a calculation according to the instruction given. The output can then be stored in a memory file when necessary, and written back to the register file as dictated by the FSM control signals.
 
 ### Program Counter
 ![](./images/choose.png)
