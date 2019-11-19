@@ -41,6 +41,7 @@ IF. It is the write enable for the instruction register. The write enables for
 the R_rs and R_rt registers, R_rsReg and R_rtReg, are only high in EX.
 ------------------------------------------------------------------------------*/
 module FSM (
+  output[2:0]        state,
   output reg[1:0]    RegDst,
   output reg         RegWr,
   output reg         ALUSrc,
@@ -61,7 +62,7 @@ module FSM (
   input  [5:0]       opcode,
   input              clk
   );
-reg[2:0]  state;
+//reg[2:0]  state;
 reg[2:0]  nextState;
 reg       wb;
 reg       mem;
@@ -70,11 +71,12 @@ initial nextState = `IF;
 always @(posedge clk) begin
   state = nextState;
   case (state)
-    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; end
+    `IF: begin  addrGen = 1'b0; nextState <= `ID; instrReg = 1'b1; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b0; PCReg=1'b1; end
     `ID: begin
       //R_rsReg = 1'b0;
       //R_rtReg = 1'b0;
       //always @* begin
+        PCReg=1'b0;
         addrGen = 1'b1;
         instrReg = 1'b0;
         if (opcode == `Rtype) begin
@@ -100,6 +102,7 @@ always @(posedge clk) begin
 
     end
     `EX: begin
+      PCReg = 1'b1;
       R_rsReg = 1'b1;
       R_rtReg = 1'b1;
       addrGen = 1'b0;
@@ -113,6 +116,7 @@ always @(posedge clk) begin
       endcase
     end
     `MEM: begin
+      PCReg = 1'b1;
       R_rsReg = 1'b0;
       R_rtReg = 1'b0;
       addrGen = 1'b0;
@@ -121,7 +125,7 @@ always @(posedge clk) begin
         1: begin  nextState=`WB;  end
       endcase
     end
-    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1;  end
+    `WB: begin  addrGen = 0; nextState = `IF; R_rsReg = 1'b0; R_rtReg = 1'b0; RegWr=1'b1; PCReg = 1'b1;  end
   endcase
 end
 endmodule
